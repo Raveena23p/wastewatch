@@ -1,11 +1,19 @@
-"use client"
+"use client";
 
-import { useState } from 'react'
-import { Button } from "@/components/ui/button"
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
-import { ArrowLeft, Thermometer, Droplets, Wind, Battery } from 'lucide-react'
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { ArrowLeft, Thermometer, Droplets, Wind, Battery } from "lucide-react";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 import {
   Table,
   TableBody,
@@ -13,20 +21,24 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { DatePicker } from "@/components/ui/date-picker"
+} from "@/components/ui/table";
+import { DatePicker } from "@/components/ui/date-picker";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 
 // Mock data generation function
-const generateMockData = (startDate, endDate, view) => {
-  const data = []
-  const currentDate = new Date(startDate)
+const generateMockData = (
+  startDate: string | number | Date,
+  endDate: number | Date,
+  view: string
+) => {
+  const data = [];
+  const currentDate = new Date(startDate);
   while (currentDate <= endDate) {
     const entry = {
       time: currentDate.toISOString(),
@@ -35,48 +47,70 @@ const generateMockData = (startDate, endDate, view) => {
       humidity: Math.floor(Math.random() * 60) + 20,
       gasProduction: Math.floor(Math.random() * 30),
       batteryCharge: Math.floor(Math.random() * 100),
-    }
-    data.push(entry)
+    };
+    data.push(entry);
 
     switch (view) {
-      case 'hour':
-        currentDate.setHours(currentDate.getHours() + 1)
-        break
-      case 'day':
-        currentDate.setDate(currentDate.getDate() + 1)
-        break
-      case 'week':
-        currentDate.setDate(currentDate.getDate() + 7)
-        break
-      case 'month':
-        currentDate.setMonth(currentDate.getMonth() + 1)
-        break
+      case "hour":
+        currentDate.setHours(currentDate.getHours() + 1);
+        break;
+      case "day":
+        currentDate.setDate(currentDate.getDate() + 1);
+        break;
+      case "week":
+        currentDate.setDate(currentDate.getDate() + 7);
+        break;
+      case "month":
+        currentDate.setMonth(currentDate.getMonth() + 1);
+        break;
     }
   }
-  return data
+  return data;
+};
+
+interface Bin {
+  name: string;
+  location: string;
+  fillLevel: number;
+  temperature: number;
+  humidity: number;
+  gasProduction: number;
+  batteryCharge: number;
 }
 
-export default function BinDetails({ bin, onBack }) {
-  const [startDate, setStartDate] = useState(new Date(new Date().setDate(new Date().getDate() - 7)))
-  const [endDate, setEndDate] = useState(new Date())
-  const [view, setView] = useState('day')
-  const [showTable, setShowTable] = useState(false)
+interface BinDetailsProps {
+  bin: Bin;
+  onBack: () => void;
+}
 
-  const graphData = generateMockData(startDate, endDate, view)
+export default function BinDetails({ bin, onBack }: BinDetailsProps) {
+  const [startDate, setStartDate] = useState(
+    new Date(new Date().setDate(new Date().getDate() - 7))
+  );
+  const [endDate, setEndDate] = useState(new Date());
+  const [view, setView] = useState("day");
+  const [showTable, setShowTable] = useState(false);
 
-  const formatXAxis = (tickItem) => {
-    const date = new Date(tickItem)
+  const graphData = generateMockData(startDate, endDate, view);
+
+  const formatXAxis = (tickItem: string | number | Date) => {
+    const date = new Date(tickItem);
     switch (view) {
-      case 'hour':
-        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      case 'day':
-        return date.toLocaleDateString()
-      case 'week':
-        return `Week ${Math.ceil(date.getDate() / 7)}`
-      case 'month':
-        return date.toLocaleDateString([], { month: 'short', year: 'numeric' })
+      case "hour":
+        return date.toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      case "day":
+        return date.toLocaleDateString();
+      case "week":
+        return `Week ${Math.ceil(date.getDate() / 7)}`;
+      case "month":
+        return date.toLocaleDateString([], { month: "short", year: "numeric" });
+      default:
+        return "";
     }
-  }
+  };
 
   return (
     <Card className="max-w-4xl mx-auto">
@@ -127,18 +161,18 @@ export default function BinDetails({ bin, onBack }) {
             </div>
           </div>
         </div>
-        
+
         <div className="mt-8">
           <h3 className="text-xl font-semibold mb-4">Waste Collection Data</h3>
           <div className="flex flex-wrap gap-4 mb-4">
             <DatePicker
               selected={startDate}
-              onSelect={setStartDate}
+              onSelect={(d) => setStartDate(d ?? new Date())}
               label="Start Date"
             />
             <DatePicker
               selected={endDate}
-              onSelect={setEndDate}
+              onSelect={(d) => setEndDate(d ?? new Date())}
               label="End Date"
             />
             <Select value={view} onValueChange={setView}>
@@ -153,14 +187,14 @@ export default function BinDetails({ bin, onBack }) {
               </SelectContent>
             </Select>
           </div>
-          <div 
-            className="h-[300px] cursor-pointer" 
+          <div
+            className="h-[300px] cursor-pointer"
             onClick={() => setShowTable(!showTable)}
             role="button"
             tabIndex={0}
             onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                setShowTable(!showTable)
+              if (e.key === "Enter" || e.key === " ") {
+                setShowTable(!showTable);
               }
             }}
           >
@@ -177,22 +211,35 @@ export default function BinDetails({ bin, onBack }) {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="time" tickFormatter={formatXAxis} />
                 <YAxis />
-                <Tooltip 
+                <Tooltip
                   labelFormatter={(label) => new Date(label).toLocaleString()}
-                  formatter={(value, name) => [value, name.charAt(0).toUpperCase() + name.slice(1)]}
+                  formatter={(value, name) => [
+                    value,
+                    String(name).charAt(0).toUpperCase() +
+                      String(name).slice(1),
+                  ]}
                 />
-                <Line type="monotone" dataKey="level" name="Fill Level" stroke="#8884d8" activeDot={{ r: 8 }} />
+                <Line
+                  type="monotone"
+                  dataKey="level"
+                  name="Fill Level"
+                  stroke="#8884d8"
+                  activeDot={{ r: 8 }}
+                />
               </LineChart>
             </ResponsiveContainer>
           </div>
           <p className="text-sm text-center mt-2 text-muted-foreground">
-            Click on the graph to {showTable ? 'hide' : 'show'} detailed data table
+            Click on the graph to {showTable ? "hide" : "show"} detailed data
+            table
           </p>
         </div>
 
         {showTable && (
           <div className="mt-8 overflow-x-auto">
-            <h3 className="text-xl font-semibold mb-4">Detailed Waste Collection Data</h3>
+            <h3 className="text-xl font-semibold mb-4">
+              Detailed Waste Collection Data
+            </h3>
             <Table>
               <TableHeader>
                 <TableRow>
@@ -207,7 +254,9 @@ export default function BinDetails({ bin, onBack }) {
               <TableBody>
                 {graphData.map((entry, index) => (
                   <TableRow key={index}>
-                    <TableCell>{new Date(entry.time).toLocaleString()}</TableCell>
+                    <TableCell>
+                      {new Date(entry.time).toLocaleString()}
+                    </TableCell>
                     <TableCell>{entry.level}</TableCell>
                     <TableCell>{entry.temperature}</TableCell>
                     <TableCell>{entry.humidity}</TableCell>
@@ -225,6 +274,5 @@ export default function BinDetails({ bin, onBack }) {
         </p>
       </CardContent>
     </Card>
-  )
+  );
 }
-

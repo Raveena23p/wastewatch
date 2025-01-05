@@ -89,7 +89,18 @@ const bins = [
 ]
 
 export default function BinLocations() {
-  const [selectedBin, setSelectedBin] = useState(null)
+  interface Bin {
+    id: number;
+    name: string;
+    location: string;
+    fillLevel: number;
+    temperature: number;
+    humidity: number;
+    gasProduction: number;
+    batteryCharge: number;
+  }
+  
+  const [selectedBin, setSelectedBin] = useState<Bin | null>(null)
 
   return (
     <div className="container mx-auto mt-8">
