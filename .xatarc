@@ -1,0 +1,6 @@
+{
+  "databaseURL": "https://Raveena23p-s-workspace-g6b1il.eu-central-1.xata.sh/db/wastewatch",
+  "codegen": {
+    "output": "xata.ts"
+  }
+}

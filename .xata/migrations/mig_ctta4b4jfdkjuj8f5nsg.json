@@ -1,0 +1,24 @@
+{
+  "done": true,
+  "migration": {
+    "name": "mig_ctta4b4jfdkjuj8f5nsg",
+    "operations": [
+      {
+        "add_column": {
+          "table": "sensordata",
+          "column": {
+            "name": "data",
+            "type": "text",
+            "comment": "",
+            "nullable": true
+          }
+        }
+      }
+    ]
+  },
+  "migrationType": "pgroll",
+  "name": "mig_ctta4b4jfdkjuj8f5nsg",
+  "parent": "mig_ctta444jfdkjuj8f5nrg",
+  "schema": "public",
+  "startedAt": "2025-01-05T15:15:56.721609Z"
+}
