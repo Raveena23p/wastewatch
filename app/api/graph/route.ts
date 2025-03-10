@@ -14,7 +14,7 @@ export async function GET(request: Request) {
         // Process data for the graph
         const processedData = binGraphData.map((entry) => ({
             time: entry?.updatetime?.toISOString(),
-            level: Math.floor(((entry?.fillcm ?? 1) / (entry?.bin?.binheight ?? 1)) * 100),
+            level: Math.round(((entry.fillcm ?? 1) / (entry.bin?.binheight ?? 1)) * 100) || 0,
             temperature: Math.floor(entry?.temperature ?? 0),
             humidity: Math.floor(entry?.humidity ?? 0),
             gasProduction: Math.floor(entry?.gasppm ?? 0),

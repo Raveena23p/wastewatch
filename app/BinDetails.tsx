@@ -160,34 +160,57 @@ export default function BinDetails({ bin, onBack }: BinDetailsProps) {
 
         <div className="mt-8">
           <h3 className="text-xl font-semibold mb-4">Waste Collection Data</h3>
-          {loading ? (
-    <p className="text-center text-lg font-semibold">Hold on...Making waste stats look pretty!</p>
-  ) :(
-          <div
-            className="h-[300px] cursor-pointer"
-            onClick={() => setShowTable(!showTable)}
-            role="button"
-          >
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart
-                data={graphData}
-                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="time" tickFormatter={formatXAxis} />
-                <YAxis />
-                <Tooltip />
-                <Line
-                  type="monotone"
-                  dataKey="level"
-                  name="Fill Level"
-                  stroke="#8884d8"
-                  activeDot={{ r: 8 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
+          <div className="flex flex-wrap gap-4 mb-4">
+            <DatePicker
+              selected={startDate}
+              onSelect={(d) => setStartDate(d ?? new Date())}
+              label="Start Date"
+            />
+            <DatePicker
+              selected={endDate}
+              onSelect={(d) => setEndDate(d ?? new Date())}
+              label="End Date"
+            />
+            <Select value={view} onValueChange={setView}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Select view" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="hour">Hour View</SelectItem>
+                <SelectItem value="day">Day View</SelectItem>
+                <SelectItem value="week">Week View</SelectItem>
+                <SelectItem value="month">Month View</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-  )}
+          {loading ? (
+            <p className="text-center text-lg font-semibold">Hold on...Making waste stats look pretty!</p>
+          ) : (
+            <div
+              className="h-[300px] cursor-pointer"
+              onClick={() => setShowTable(!showTable)}
+              role="button"
+            >
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart
+                  data={graphData}
+                  margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="time" tickFormatter={formatXAxis} />
+                  <YAxis />
+                  <Tooltip />
+                  <Line
+                    type="monotone"
+                    dataKey="level"
+                    name="Fill Level"
+                    stroke="#8884d8"
+                    activeDot={{ r: 8 }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          )}
         </div>
 
         {showTable && (
