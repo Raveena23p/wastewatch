@@ -7,7 +7,13 @@ export async function POST(req: Request) {
         const body = await req.json();
         const sensorData = body?.data;
         const record = await xata.db.sensordata.create({
-            data: sensorData
+            battery: sensorData?.batteryCharge,
+            bin: sensorData?.binId,
+            fillcm: sensorData?.fillLevel,
+            gasppm: sensorData?.gasProduction,
+            humidity: sensorData?.humidity,
+            temperature: sensorData?.temperature,
+            updatetime: new Date()
         })
         return Response.json({
             message: 'Sucess',

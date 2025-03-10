@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -31,44 +31,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-// Mock data generation function
-const generateMockData = (
-  startDate: string | number | Date,
-  endDate: number | Date,
-  view: string
-) => {
-  const data = [];
-  const currentDate = new Date(startDate);
-  while (currentDate <= endDate) {
-    const entry = {
-      time: currentDate.toISOString(),
-      level: Math.floor(Math.random() * 100),
-      temperature: Math.floor(Math.random() * 30) + 10,
-      humidity: Math.floor(Math.random() * 60) + 20,
-      gasProduction: Math.floor(Math.random() * 30),
-      batteryCharge: Math.floor(Math.random() * 100),
-    };
-    data.push(entry);
-
-    switch (view) {
-      case "hour":
-        currentDate.setHours(currentDate.getHours() + 1);
-        break;
-      case "day":
-        currentDate.setDate(currentDate.getDate() + 1);
-        break;
-      case "week":
-        currentDate.setDate(currentDate.getDate() + 7);
-        break;
-      case "month":
-        currentDate.setMonth(currentDate.getMonth() + 1);
-        break;
-    }
-  }
-  return data;
-};
-
 interface Bin {
+  id: string;
   name: string;
   location: string;
   fillLevel: number;
@@ -90,8 +54,40 @@ export default function BinDetails({ bin, onBack }: BinDetailsProps) {
   const [endDate, setEndDate] = useState(new Date());
   const [view, setView] = useState("day");
   const [showTable, setShowTable] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [graphData, setGraphData] = useState<
+    {
+      time: string;
+      level: number;
+      temperature: number;
+      humidity: number;
+      gasProduction: number;
+      batteryCharge: number;
+    }[]
+  >([]);
 
-  const graphData = generateMockData(startDate, endDate, view);
+
+  // Fetch data from API
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`/api/graph?binId=${bin.id}`);
+        const result = await response.json();
+
+        if (result.success && result.data) {
+          setGraphData(result.data);
+        }
+      } catch (error) {
+        console.error("Error fetching graph data:", error);
+      }
+      finally {
+        setLoading(false); // Stop loading
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const formatXAxis = (tickItem: string | number | Date) => {
     const date = new Date(tickItem);
@@ -164,61 +160,23 @@ export default function BinDetails({ bin, onBack }: BinDetailsProps) {
 
         <div className="mt-8">
           <h3 className="text-xl font-semibold mb-4">Waste Collection Data</h3>
-          <div className="flex flex-wrap gap-4 mb-4">
-            <DatePicker
-              selected={startDate}
-              onSelect={(d) => setStartDate(d ?? new Date())}
-              label="Start Date"
-            />
-            <DatePicker
-              selected={endDate}
-              onSelect={(d) => setEndDate(d ?? new Date())}
-              label="End Date"
-            />
-            <Select value={view} onValueChange={setView}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Select view" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="hour">Hour View</SelectItem>
-                <SelectItem value="day">Day View</SelectItem>
-                <SelectItem value="week">Week View</SelectItem>
-                <SelectItem value="month">Month View</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          {loading ? (
+    <p className="text-center text-lg font-semibold">Hold on...Making waste stats look pretty!</p>
+  ) :(
           <div
             className="h-[300px] cursor-pointer"
             onClick={() => setShowTable(!showTable)}
             role="button"
-            tabIndex={0}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                setShowTable(!showTable);
-              }
-            }}
           >
             <ResponsiveContainer width="100%" height="100%">
               <LineChart
                 data={graphData}
-                margin={{
-                  top: 5,
-                  right: 30,
-                  left: 20,
-                  bottom: 5,
-                }}
+                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
               >
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="time" tickFormatter={formatXAxis} />
                 <YAxis />
-                <Tooltip
-                  labelFormatter={(label) => new Date(label).toLocaleString()}
-                  formatter={(value, name) => [
-                    value,
-                    String(name).charAt(0).toUpperCase() +
-                      String(name).slice(1),
-                  ]}
-                />
+                <Tooltip />
                 <Line
                   type="monotone"
                   dataKey="level"
@@ -229,17 +187,11 @@ export default function BinDetails({ bin, onBack }: BinDetailsProps) {
               </LineChart>
             </ResponsiveContainer>
           </div>
-          <p className="text-sm text-center mt-2 text-muted-foreground">
-            Click on the graph to {showTable ? "hide" : "show"} detailed data
-            table
-          </p>
+  )}
         </div>
 
         {showTable && (
           <div className="mt-8 overflow-x-auto">
-            <h3 className="text-xl font-semibold mb-4">
-              Detailed Waste Collection Data
-            </h3>
             <Table>
               <TableHeader>
                 <TableRow>
@@ -268,10 +220,6 @@ export default function BinDetails({ bin, onBack }: BinDetailsProps) {
             </Table>
           </div>
         )}
-
-        <p className="mt-6 text-sm text-muted-foreground">
-          Last updated: {new Date().toLocaleString()}
-        </p>
       </CardContent>
     </Card>
   );

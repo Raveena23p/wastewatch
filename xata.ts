@@ -8,6 +8,119 @@ import type {
 
 const tables = [
   {
+    name: "bindetails",
+    checkConstraints: {
+      binDetails_xata_id_length_xata_id: {
+        name: "binDetails_xata_id_length_xata_id",
+        columns: ["xata_id"],
+        definition: "CHECK ((length(xata_id) < 256))",
+      },
+    },
+    foreignKeys: {
+      binmanager_link: {
+        name: "binmanager_link",
+        columns: ["binmanager"],
+        referencedTable: "users",
+        referencedColumns: ["xata_id"],
+        onDelete: "SET NULL",
+      },
+    },
+    primaryKey: [],
+    uniqueConstraints: {
+      _pgroll_new_binDetails_xata_id_key: {
+        name: "_pgroll_new_binDetails_xata_id_key",
+        columns: ["xata_id"],
+      },
+      binDetails__pgroll_new_binname_key: {
+        name: "binDetails__pgroll_new_binname_key",
+        columns: ["binname"],
+      },
+    },
+    columns: [
+      {
+        name: "address",
+        type: "text",
+        notNull: false,
+        unique: false,
+        defaultValue: null,
+        comment: "",
+      },
+      {
+        name: "binheight",
+        type: "int",
+        notNull: true,
+        unique: false,
+        defaultValue: "150",
+        comment: "",
+      },
+      {
+        name: "binmanager",
+        type: "link",
+        link: { table: "users" },
+        notNull: false,
+        unique: false,
+        defaultValue: null,
+        comment: '{"xata.link":"users"}',
+      },
+      {
+        name: "binname",
+        type: "text",
+        notNull: true,
+        unique: true,
+        defaultValue: null,
+        comment: "",
+      },
+      {
+        name: "lat",
+        type: "float",
+        notNull: false,
+        unique: false,
+        defaultValue: null,
+        comment: "",
+      },
+      {
+        name: "lng",
+        type: "float",
+        notNull: false,
+        unique: false,
+        defaultValue: null,
+        comment: "",
+      },
+      {
+        name: "xata_createdat",
+        type: "datetime",
+        notNull: true,
+        unique: false,
+        defaultValue: "now()",
+        comment: "",
+      },
+      {
+        name: "xata_id",
+        type: "text",
+        notNull: true,
+        unique: true,
+        defaultValue: "('rec_'::text || (xata_private.xid())::text)",
+        comment: "",
+      },
+      {
+        name: "xata_updatedat",
+        type: "datetime",
+        notNull: true,
+        unique: false,
+        defaultValue: "now()",
+        comment: "",
+      },
+      {
+        name: "xata_version",
+        type: "int",
+        notNull: true,
+        unique: false,
+        defaultValue: "0",
+        comment: "",
+      },
+    ],
+  },
+  {
     name: "sensordata",
     checkConstraints: {
       sensordata_xata_id_length_xata_id: {
@@ -16,17 +129,146 @@ const tables = [
         definition: "CHECK ((length(xata_id) < 256))",
       },
     },
-    foreignKeys: {},
+    foreignKeys: {
+      bin_link: {
+        name: "bin_link",
+        columns: ["bin"],
+        referencedTable: "bindetails",
+        referencedColumns: ["xata_id"],
+        onDelete: "SET NULL",
+      },
+    },
     primaryKey: [],
     uniqueConstraints: {
       _pgroll_new_sensordata_xata_id_key: {
         name: "_pgroll_new_sensordata_xata_id_key",
         columns: ["xata_id"],
       },
+      sensordata__pgroll_new_updatetime_key: {
+        name: "sensordata__pgroll_new_updatetime_key",
+        columns: ["updatetime"],
+      },
     },
     columns: [
       {
-        name: "data",
+        name: "battery",
+        type: "int",
+        notNull: true,
+        unique: false,
+        defaultValue: "100",
+        comment: "",
+      },
+      {
+        name: "bin",
+        type: "link",
+        link: { table: "bindetails" },
+        notNull: false,
+        unique: false,
+        defaultValue: null,
+        comment: '{"xata.link":"bindetails"}',
+      },
+      {
+        name: "fillcm",
+        type: "float",
+        notNull: false,
+        unique: false,
+        defaultValue: null,
+        comment: "",
+      },
+      {
+        name: "gasppm",
+        type: "float",
+        notNull: false,
+        unique: false,
+        defaultValue: null,
+        comment: "",
+      },
+      {
+        name: "humidity",
+        type: "float",
+        notNull: false,
+        unique: false,
+        defaultValue: null,
+        comment: "",
+      },
+      {
+        name: "temperature",
+        type: "float",
+        notNull: false,
+        unique: false,
+        defaultValue: null,
+        comment: "",
+      },
+      {
+        name: "updatetime",
+        type: "datetime",
+        notNull: false,
+        unique: true,
+        defaultValue: null,
+        comment: "",
+      },
+      {
+        name: "xata_createdat",
+        type: "datetime",
+        notNull: true,
+        unique: false,
+        defaultValue: "now()",
+        comment: "",
+      },
+      {
+        name: "xata_id",
+        type: "text",
+        notNull: true,
+        unique: true,
+        defaultValue: "('rec_'::text || (xata_private.xid())::text)",
+        comment: "",
+      },
+      {
+        name: "xata_updatedat",
+        type: "datetime",
+        notNull: true,
+        unique: false,
+        defaultValue: "now()",
+        comment: "",
+      },
+      {
+        name: "xata_version",
+        type: "int",
+        notNull: true,
+        unique: false,
+        defaultValue: "0",
+        comment: "",
+      },
+    ],
+  },
+  {
+    name: "users",
+    checkConstraints: {
+      users_xata_id_length_xata_id: {
+        name: "users_xata_id_length_xata_id",
+        columns: ["xata_id"],
+        definition: "CHECK ((length(xata_id) < 256))",
+      },
+    },
+    foreignKeys: {},
+    primaryKey: [],
+    uniqueConstraints: {
+      _pgroll_new_users_xata_id_key: {
+        name: "_pgroll_new_users_xata_id_key",
+        columns: ["xata_id"],
+      },
+    },
+    columns: [
+      {
+        name: "name",
+        type: "text",
+        notNull: false,
+        unique: false,
+        defaultValue: null,
+        comment: "",
+      },
+      {
+        name: "password",
         type: "text",
         notNull: false,
         unique: false,
@@ -72,11 +314,19 @@ const tables = [
 export type SchemaTables = typeof tables;
 export type InferredTypes = SchemaInference<SchemaTables>;
 
+export type Bindetails = InferredTypes["bindetails"];
+export type BindetailsRecord = Bindetails & XataRecord;
+
 export type Sensordata = InferredTypes["sensordata"];
 export type SensordataRecord = Sensordata & XataRecord;
 
+export type Users = InferredTypes["users"];
+export type UsersRecord = Users & XataRecord;
+
 export type DatabaseSchema = {
+  bindetails: BindetailsRecord;
   sensordata: SensordataRecord;
+  users: UsersRecord;
 };
 
 const DatabaseClient = buildClient();
@@ -97,6 +347,10 @@ let instance: XataClient | undefined = undefined;
 export const getXataClient = () => {
   if (instance) return instance;
 
-  instance = new XataClient({ apiKey: process.env.XATA_API_KEY, branch: process.env.XATA_BRANCH });
+  instance = new XataClient({
+    apiKey: process.env.XATA_API_KEY,
+    fetch: fetch,
+    branch: process.env.XATA_BRANCH
+  });
   return instance;
 };

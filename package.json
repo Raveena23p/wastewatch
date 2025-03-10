@@ -24,7 +24,8 @@
     "react-dom": "^19.0.0",
     "recharts": "^2.15.0",
     "tailwind-merge": "^2.6.0",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "wastewatch": "file:"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
