@@ -119,7 +119,7 @@ export default function BinDetails({ bin, onBack }: BinDetailsProps) {
         <Button variant="ghost" onClick={onBack} className="mb-2">
           <ArrowLeft className="mr-2 h-4 w-4" /> Back to Overview
         </Button>
-        <CardTitle className="text-2xl justify-between px-2 w-full flex items-center">
+        <CardTitle className="text-2xl justify-between px-2 w-full flex items-center flex-wrap gap-2">
           <span>{bin.name}</span>
           <span className="text-sm font-semibold text-gray-900 mr-2">
             Last Updated:{" "}
@@ -166,7 +166,7 @@ export default function BinDetails({ bin, onBack }: BinDetailsProps) {
           <h3 className="text-xl font-semibold mb-4">Waste Collection Data</h3>
 
           {/* Drop-down selectors */}
-          <div className="flex items-center gap-4 mt-4">
+          <div className="flex items-center gap-4 mt-4 flex-wrap">
             {/* Select View (Day/Week/Month) */}
             <div>
               <h3 className="text-md font-semibold mb-2">Select View:</h3>
@@ -240,9 +240,18 @@ export default function BinDetails({ bin, onBack }: BinDetailsProps) {
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={filteredGraphData}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="time" />
+                  <XAxis
+                    dataKey="time"
+                    tickFormatter={(timeStr) =>
+                      format(new Date(timeStr), "MMM d,HH:mm")
+                    }
+                  />
                   <YAxis />
-                  <Tooltip />
+                  <Tooltip
+                    labelFormatter={(label) =>
+                      format(new Date(label), "MMM d yyyy,HH:mm")
+                    }
+                  />
                   <Line
                     type="monotone"
                     dataKey={selectedMetric} // ✅ Show only the selected metric

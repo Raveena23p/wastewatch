@@ -87,7 +87,7 @@ export default function BinLocations() {
   };
 
   return (
-    <div className="container mx-auto mt-8">
+    <div className="container mx-auto mt-8 px-2">
       {selectedBin ? (
         <BinDetails bin={selectedBin} onBack={() => setSelectedBin(null)} />
       ) : (
