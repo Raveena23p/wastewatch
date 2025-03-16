@@ -1,10 +1,8 @@
 "use client";
-
 import { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import BinDetails from "./BinDetails";
 import { Thermometer, Droplets, Wind, Battery } from "lucide-react";
-import Aichatmodal from "@/app/Aichatmodal";
 
 export interface Bin {
   id: string;
@@ -20,7 +18,6 @@ export interface Bin {
 
 export default function BinLocations() {
   const [binData, setBinData] = useState<Bin[]>([]);
-  const [filteredData, setFilteredData] = useState<Bin[]>([]);
   const [selectedBin, setSelectedBin] = useState<Bin | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -39,7 +36,6 @@ export default function BinLocations() {
             const formatted = formatBinData(data.data);
             console.log("Formatted Data:", formatted);
             setBinData([...formatted]); // Force update
-            setFilteredData(formatted)// Apply filter immediately
           } else {
             console.error("Unexpected response format:", data);
             setError("Invalid data format received.");
@@ -56,13 +52,8 @@ export default function BinLocations() {
         });
     };
 
-    fetchData(); // Initial fetch
-
+    fetchData();
   }, []);
-
-  // useEffect(() => {
-  //   applyFilter(binData, timeFilter);
-  // }, [timeFilter, binData]);
 
   const formatBinData = (bins: any[]): Bin[] => {
     console.log("Formatting bin data:", bins);
@@ -83,8 +74,8 @@ export default function BinLocations() {
       name: bin.binname || "Unknown Bin",
       location: bin.address || "Unknown Location",
       fillLevel: Math.round((bin.fillcm / bin.binheight) * 100) || 0,
-      temperature: bin.temperature || 0,
-      humidity: bin.humidity || 0,
+      temperature: bin.temperature ? parseFloat(bin.temperature.toFixed(1)) : 0,
+      humidity: bin.humidity ? parseFloat(bin.humidity.toFixed(1)) : 0,
       gasProduction: bin.gasppm || 0,
       batteryCharge: bin.battery || 0,
       timestamp: bin.updatetime || new Date().toISOString(), // Ensure timestamp exists
@@ -95,41 +86,14 @@ export default function BinLocations() {
     });
   };
 
-  // const applyFilter = (data: Bin[], filter: string) => {
-  //   const now = new Date();
-  //   let filtered: Bin[] = [];
-
-  //   if (filter === "day") {
-  //     filtered = data.filter(
-  //       (bin) =>
-  //         new Date(bin.timestamp).toDateString() === now.toDateString()
-  //     );
-  //   } else if (filter === "week") {
-  //     const oneWeekAgo = new Date();
-  //     oneWeekAgo.setDate(now.getDate() - 7);
-  //     filtered = data.filter(
-  //       (bin) => new Date(bin.timestamp) >= oneWeekAgo
-  //     );
-  //   } else if (filter === "month") {
-  //     const oneMonthAgo = new Date();
-  //     oneMonthAgo.setMonth(now.getMonth() - 1);
-  //     filtered = data.filter(
-  //       (bin) => new Date(bin.timestamp) >= oneMonthAgo
-  //     );
-  //   }
-
-  //   setFilteredData(filtered);
-  //   console.log("Filtered Data:", filtered);
-  // };
-
   return (
     <div className="container mx-auto mt-8">
       {selectedBin ? (
         <BinDetails bin={selectedBin} onBack={() => setSelectedBin(null)} />
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {Array.isArray(filteredData) && filteredData.length > 0 ? (
-            filteredData.map((bin, index) => (
+          {Array.isArray(binData) && binData.length > 0 ? (
+            binData.map((bin, index) => (
               <Card
                 key={bin.id || index}
                 className="cursor-pointer hover:bg-accent transition-all duration-300"
@@ -145,7 +109,9 @@ export default function BinLocations() {
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
                       <span className="text-sm">Fill Level:</span>
-                      <span className="text-sm font-semibold">{bin.fillLevel}%</span>
+                      <span className="text-sm font-semibold">
+                        {bin.fillLevel}%
+                      </span>
                     </div>
                     <div className="h-2 bg-secondary rounded-full overflow-hidden">
                       <div
@@ -172,9 +138,6 @@ export default function BinLocations() {
                       <Battery className="w-4 h-4 mr-1" />
                       <span className="text-xs">{bin.batteryCharge}%</span>
                     </div>
-                  </div>
-                  <div className="fixed bottom-6 right-6 z-50">
-                    <Aichatmodal />
                   </div>
                 </CardContent>
               </Card>

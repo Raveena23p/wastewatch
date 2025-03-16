@@ -13,16 +13,39 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Table,
+  TableHeader,
+  TableRow,
+  TableHead,
+  TableBody,
+  TableCell,
+} from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
-import { format, subDays, startOfMonth, endOfMonth, isWithinInterval } from "date-fns";
-import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+import {
+  format,
+  subDays,
+  startOfMonth,
+  endOfMonth,
+  isWithinInterval,
+} from "date-fns";
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from "@/components/ui/popover";
 import { CalendarIcon } from "lucide-react";
 import Aichatmodal from "@/app/Aichatmodal";
 import { Bin } from "./BinLocations";
 
-interface GraphEntry {
+export interface GraphEntry {
   time: string;
   level: number;
   temperature: number;
@@ -43,10 +66,8 @@ export default function BinDetails({ bin, onBack }: BinDetailsProps) {
   const [graphData, setGraphData] = useState<GraphEntry[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
 
-
-
   useEffect(() => {
-    setSelectedDate(new Date(bin?.timestamp))
+    setSelectedDate(new Date(bin?.timestamp));
     const fetchData = async () => {
       try {
         setLoading(true);
@@ -71,9 +92,7 @@ export default function BinDetails({ bin, onBack }: BinDetailsProps) {
     if (!selectedDate) return false;
 
     if (view === "day") {
-      return (
-        entryDate.toDateString() === selectedDate.toDateString()
-      );
+      return entryDate.toDateString() === selectedDate.toDateString();
     }
     if (view === "week") {
       return isWithinInterval(entryDate, {
@@ -83,7 +102,9 @@ export default function BinDetails({ bin, onBack }: BinDetailsProps) {
     }
     if (view === "month") {
       const maxEndDate = subDays(selectedDate, -29); // ✅ Max range: 30 days
-      const lastAvailableDate = new Date(graphData[graphData.length - 1]?.time || maxEndDate);
+      const lastAvailableDate = new Date(
+        graphData[graphData.length - 1]?.time || maxEndDate
+      );
       return isWithinInterval(entryDate, {
         start: selectedDate,
         end: lastAvailableDate > maxEndDate ? maxEndDate : lastAvailableDate, // ✅ Stop at 30 days or last available data
@@ -91,8 +112,6 @@ export default function BinDetails({ bin, onBack }: BinDetailsProps) {
     }
     return false;
   });
-
-
 
   return (
     <Card className="max-w-4xl mx-auto">
@@ -103,25 +122,33 @@ export default function BinDetails({ bin, onBack }: BinDetailsProps) {
         <CardTitle className="text-2xl">{bin.name}</CardTitle>
         <div className="bg-white rounded-2xl shadow-md p-4 border border-gray-300">
           <div className="grid grid-cols-2 gap-2">
-            <div className="flex items-center">
+            <div className="flex items-center gap-2">
               <Thermometer className="w-4 h-4 text-blue-500 mr-1" />
               <span className="text-xs text-gray-700">Temperature:</span>
-              <span className="text-xs font-semibold text-gray-900">{(Math.round(bin.temperature))}°C</span>
+              <span className="text-xs font-semibold text-gray-900">
+                {Math.round(bin.temperature)}°C
+              </span>
             </div>
-            <div className="flex items-center">
+            <div className="flex items-center gap-2">
               <Droplets className="w-4 h-4 text-blue-400 mr-1" />
               <span className="text-xs text-gray-700">Humidity:</span>
-              <span className="text-xs font-semibold text-gray-900">{(Math.round(bin.humidity))}%</span>
+              <span className="text-xs font-semibold text-gray-900">
+                {Math.round(bin.humidity)}%
+              </span>
             </div>
-            <div className="flex items-center">
+            <div className="flex items-center gap-2">
               <Wind className="w-4 h-4 text-green-600 mr-1" />
               <span className="text-xs text-gray-700">Gas Production:</span>
-              <span className="text-xs font-semibold text-gray-900">{(Math.round(bin.gasProduction))} ppm</span>
+              <span className="text-xs font-semibold text-gray-900">
+                {Math.round(bin.gasProduction)} ppm
+              </span>
             </div>
-            <div className="flex items-center">
+            <div className="flex items-center gap-2">
               <Battery className="w-4 h-4 text-orange-500 mr-1" />
               <span className="text-xs text-gray-700">Battery Charge:</span>
-              <span className="text-xs font-semibold text-gray-900">{bin.batteryCharge}%</span>
+              <span className="text-xs font-semibold text-gray-900">
+                {bin.batteryCharge}%
+              </span>
             </div>
           </div>
         </div>
@@ -129,10 +156,15 @@ export default function BinDetails({ bin, onBack }: BinDetailsProps) {
       <div className="flex justify-between items-center mt-2 text-xs font-medium text-gray-900">
         <span className="text-sm text-muted-foreground"></span>
         <span className="text-sm font-semibold text-gray-900 mr-2">
-          Last Updated: {graphData.length > 0 ? format(new Date(graphData[graphData.length - 1].time), "dd/MM/yyyy HH:mm") : "No Data Available"}
+          Last Updated:{" "}
+          {graphData.length > 0
+            ? format(
+                new Date(graphData[graphData.length - 1].time),
+                "dd/MM/yyyy HH:mm"
+              )
+            : "No Data Available"}
         </span>
       </div>
-
 
       <CardContent>
         <div className="mt-8">
@@ -176,19 +208,34 @@ export default function BinDetails({ bin, onBack }: BinDetailsProps) {
               <h3 className="text-md font-semibold mb-2">Select Date:</h3>
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button variant="outline" className="w-[180px] justify-between">
-                    {selectedDate ? format(selectedDate, "dd/MM/yyyy") : "Pick a date"}
+                  <Button
+                    variant="outline"
+                    className="w-[180px] justify-between"
+                  >
+                    {selectedDate
+                      ? format(selectedDate, "dd/MM/yyyy")
+                      : "Pick a date"}
                     <CalendarIcon className="w-4 h-4 ml-2" />
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-2">
-                  <Calendar mode="single" selected={selectedDate} onSelect={setSelectedDate} />
+                  <Calendar
+                    mode="single"
+                    selected={selectedDate}
+                    onSelect={setSelectedDate}
+                    disabled={(date) => {
+                      const minDate = new Date(graphData[0]?.time);
+                      const maxDate = new Date(
+                        graphData[graphData.length - 1]?.time
+                      );
+                      return date < minDate || date > maxDate;
+                    }}
+                  />
                 </PopoverContent>
               </Popover>
             </div>
           </div>
 
-          {/* Graph Display */}
           {loading ? (
             <p className="mt-6 flex justify-center items-center text-lg font-semibold">
               Hold on... Making waste stats look pretty!
@@ -208,19 +255,19 @@ export default function BinDetails({ bin, onBack }: BinDetailsProps) {
                       selectedMetric === "level"
                         ? "#8884d8"
                         : selectedMetric === "gasProduction"
-                          ? "#00C49F"
-                          : selectedMetric === "temperature"
-                            ? "#ff7300"
-                            : "#0088FE"
+                        ? "#00C49F"
+                        : selectedMetric === "temperature"
+                        ? "#ff7300"
+                        : "#0088FE"
                     }
                     name={
                       selectedMetric === "level"
                         ? "Fill Level"
                         : selectedMetric === "gasProduction"
-                          ? "Gas PPM"
-                          : selectedMetric === "temperature"
-                            ? "Temperature (°C)"
-                            : "Humidity (%)"
+                        ? "Gas PPM"
+                        : selectedMetric === "temperature"
+                        ? "Temperature (°C)"
+                        : "Humidity (%)"
                     }
                   />
                 </LineChart>
@@ -232,48 +279,48 @@ export default function BinDetails({ bin, onBack }: BinDetailsProps) {
             </p>
           )}
 
-
-          <div className="mt-6">
-            <h3 className="text-lg font-semibold mb-3">Detailed Data</h3>
-            {filteredGraphData.length > 0 ? (
-                <div style={{ maxHeight: '50vh', overflowY: 'auto' }}>
-                <Table>
-                  <TableHeader>
-                  <TableRow>
-                    <TableHead>Timestamp</TableHead>
-                    <TableHead>Fill Level (%)</TableHead>
-                    <TableHead>Temperature (°C)</TableHead>
-                    <TableHead>Humidity (%)</TableHead>
-                    <TableHead>Gas PPM</TableHead>
-                  </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                  {filteredGraphData.map((entry, index) => (
-                    <TableRow key={index}>
-                    <TableCell>{format(new Date(entry.time), "dd/MM/yyyy HH:mm")}</TableCell>
-                    <TableCell>{entry.level}</TableCell>
-                    <TableCell>{entry.temperature}</TableCell>
-                    <TableCell>{entry.humidity}</TableCell>
-                    <TableCell>{entry.gasProduction}</TableCell>
-                    </TableRow>
-                  ))}
-                  </TableBody>
-                </Table>
+          {!loading && (
+            <div className="mt-6">
+              <h3 className="text-lg font-semibold mb-3">Detailed Data</h3>
+              {filteredGraphData.length > 0 ? (
+                <div style={{ maxHeight: "50vh", overflowY: "auto" }}>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Timestamp</TableHead>
+                        <TableHead>Fill Level (%)</TableHead>
+                        <TableHead>Temperature (°C)</TableHead>
+                        <TableHead>Humidity (%)</TableHead>
+                        <TableHead>Gas PPM</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredGraphData.map((entry, index) => (
+                        <TableRow key={index}>
+                          <TableCell>
+                            {format(new Date(entry.time), "dd/MM/yyyy HH:mm")}
+                          </TableCell>
+                          <TableCell>{entry.level}</TableCell>
+                          <TableCell>{entry.temperature}</TableCell>
+                          <TableCell>{entry.humidity}</TableCell>
+                          <TableCell>{entry.gasProduction}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
                 </div>
-            ) : (
-              <p className="text-center text-lg font-semibold">
-                No data available for the selected range.
-              </p>
-            )}
-          </div>
-        </div><div className="fixed bottom-6 right-6 z-50">
-          <Aichatmodal />
+              ) : (
+                <p className="text-center text-lg font-semibold">
+                  No data available for the selected range.
+                </p>
+              )}
+            </div>
+          )}
+        </div>
+        <div className="fixed bottom-6 right-6 z-50">
+          <Aichatmodal binData={graphData} />
         </div>
       </CardContent>
-
-
     </Card>
-
-
   );
 }
