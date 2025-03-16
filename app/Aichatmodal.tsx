@@ -35,7 +35,7 @@ export default function Aichatmodal({ binData }: { binData: GraphEntry[] }) {
     }).then((res) => res.json());
   };
 
-  const { data, error } = useSWR(
+  const { data, error, isLoading } = useSWR(
     isOpen && query ? ["/api/chat", { message: query, data: binData }] : null,
     fetcher,
     {
@@ -43,18 +43,6 @@ export default function Aichatmodal({ binData }: { binData: GraphEntry[] }) {
       shouldRetryOnError: false,
     }
   );
-
-  useEffect(() => {
-    const checkKey = (e: any) =>
-      console.log(
-        "Global Key Event:",
-        e.key,
-        "Active Element:",
-        document.activeElement
-      );
-    document.addEventListener("keydown", checkKey);
-    return () => document.removeEventListener("keydown", checkKey);
-  }, []);
 
   useEffect(() => {
     if (data) {
@@ -102,8 +90,8 @@ export default function Aichatmodal({ binData }: { binData: GraphEntry[] }) {
         <DialogHeader>
           <DialogTitle>AI Chat</DialogTitle>
           <DialogDescription>
-            Chat with our AI Assistant to get more insights about this bin&apos;s
-            data
+            Chat with our AI Assistant to get more insights about this
+            bin&apos;s data
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
@@ -137,10 +125,17 @@ export default function Aichatmodal({ binData }: { binData: GraphEntry[] }) {
               ))
             )}
           </div>
+          {isLoading && (
+            <div className="flex justify-center items-center space-x-2 mt-2">
+              <span className="w-3 h-3 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+              <span className="w-3 h-3 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+              <span className="w-3 h-3 bg-gray-400 rounded-full animate-bounce"></span>
+            </div>
+          )}
         </div>
         <DialogFooter>
           <div className="flex border-t bg-gray-100 w-full">
-            <input
+            <Input
               type="text"
               className="flex-grow p-2 border rounded-lg focus:outline-none"
               autoFocus
@@ -149,7 +144,6 @@ export default function Aichatmodal({ binData }: { binData: GraphEntry[] }) {
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => {
                 e.stopPropagation();
-                console.log(e.key, "keydown");
                 if (e.key === "Enter") {
                   e.preventDefault();
                   handleSend();
