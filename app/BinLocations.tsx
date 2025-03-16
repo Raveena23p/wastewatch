@@ -4,20 +4,21 @@ import { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import BinDetails from "./BinDetails";
 import { Thermometer, Droplets, Wind, Battery } from "lucide-react";
+import Aichatmodal from "@/app/Aichatmodal";
+
+export interface Bin {
+  id: string;
+  name: string;
+  location: string;
+  fillLevel: number;
+  temperature: number;
+  humidity: number;
+  gasProduction: number;
+  batteryCharge: number;
+  timestamp: string; // Added for filtering
+}
 
 export default function BinLocations() {
-  interface Bin {
-    id: string;
-    name: string;
-    location: string;
-    fillLevel: number;
-    temperature: number;
-    humidity: number;
-    gasProduction: number;
-    batteryCharge: number;
-    timestamp: string; // Added for filtering
-  }
-
   const [binData, setBinData] = useState<Bin[]>([]);
   const [filteredData, setFilteredData] = useState<Bin[]>([]);
   const [selectedBin, setSelectedBin] = useState<Bin | null>(null);
@@ -38,7 +39,7 @@ export default function BinLocations() {
             const formatted = formatBinData(data.data);
             console.log("Formatted Data:", formatted);
             setBinData([...formatted]); // Force update
-            applyFilter(formatted, timeFilter); // Apply filter immediately
+            setFilteredData(formatted)// Apply filter immediately
           } else {
             console.error("Unexpected response format:", data);
             setError("Invalid data format received.");
@@ -56,14 +57,12 @@ export default function BinLocations() {
     };
 
     fetchData(); // Initial fetch
-    const interval = setInterval(fetchData, 10000); // Auto-refresh every 10s
 
-    return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => {
-    applyFilter(binData, timeFilter);
-  }, [timeFilter, binData]);
+  // useEffect(() => {
+  //   applyFilter(binData, timeFilter);
+  // }, [timeFilter, binData]);
 
   const formatBinData = (bins: any[]): Bin[] => {
     console.log("Formatting bin data:", bins);
@@ -88,7 +87,7 @@ export default function BinLocations() {
       humidity: bin.humidity || 0,
       gasProduction: bin.gasppm || 0,
       batteryCharge: bin.battery || 0,
-      timestamp: bin.timestamp || new Date().toISOString(), // Ensure timestamp exists
+      timestamp: bin.updatetime || new Date().toISOString(), // Ensure timestamp exists
     }));
 
     return formattedBins.sort((a, b) => {
@@ -96,37 +95,35 @@ export default function BinLocations() {
     });
   };
 
-  const applyFilter = (data: Bin[], filter: string) => {
-    const now = new Date();
-    let filtered: Bin[] = [];
+  // const applyFilter = (data: Bin[], filter: string) => {
+  //   const now = new Date();
+  //   let filtered: Bin[] = [];
 
-    if (filter === "day") {
-      filtered = data.filter(
-        (bin) =>
-          new Date(bin.timestamp).toDateString() === now.toDateString()
-      );
-    } else if (filter === "week") {
-      const oneWeekAgo = new Date();
-      oneWeekAgo.setDate(now.getDate() - 7);
-      filtered = data.filter(
-        (bin) => new Date(bin.timestamp) >= oneWeekAgo
-      );
-    } else if (filter === "month") {
-      const oneMonthAgo = new Date();
-      oneMonthAgo.setMonth(now.getMonth() - 1);
-      filtered = data.filter(
-        (bin) => new Date(bin.timestamp) >= oneMonthAgo
-      );
-    }
+  //   if (filter === "day") {
+  //     filtered = data.filter(
+  //       (bin) =>
+  //         new Date(bin.timestamp).toDateString() === now.toDateString()
+  //     );
+  //   } else if (filter === "week") {
+  //     const oneWeekAgo = new Date();
+  //     oneWeekAgo.setDate(now.getDate() - 7);
+  //     filtered = data.filter(
+  //       (bin) => new Date(bin.timestamp) >= oneWeekAgo
+  //     );
+  //   } else if (filter === "month") {
+  //     const oneMonthAgo = new Date();
+  //     oneMonthAgo.setMonth(now.getMonth() - 1);
+  //     filtered = data.filter(
+  //       (bin) => new Date(bin.timestamp) >= oneMonthAgo
+  //     );
+  //   }
 
-    setFilteredData(filtered);
-    console.log("Filtered Data:", filtered);
-  };
+  //   setFilteredData(filtered);
+  //   console.log("Filtered Data:", filtered);
+  // };
 
   return (
     <div className="container mx-auto mt-8">
-
-
       {selectedBin ? (
         <BinDetails bin={selectedBin} onBack={() => setSelectedBin(null)} />
       ) : (
@@ -175,6 +172,9 @@ export default function BinLocations() {
                       <Battery className="w-4 h-4 mr-1" />
                       <span className="text-xs">{bin.batteryCharge}%</span>
                     </div>
+                  </div>
+                  <div className="fixed bottom-6 right-6 z-50">
+                    <Aichatmodal />
                   </div>
                 </CardContent>
               </Card>
