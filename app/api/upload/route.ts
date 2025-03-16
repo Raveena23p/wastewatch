@@ -1,5 +1,5 @@
 import { getXataClient } from "@/xata";
-// Generated with CLI
+import bt from './milk_industry_waste_bins_corrected.json'
 const xata = getXataClient();
 
 export async function POST(req: Request) {
@@ -33,9 +33,10 @@ export async function POST(req: Request) {
 export async function PUT(req: Request) {
     try {
         const body = await req.json();
-        const rows = body?.rows?.map((row: any) => ({
-            battery: Math.floor(row.batteryCharge),
-            bin: 'rec_cv3imudqrj63i4ut7f1g',
+        const btData = bt?.map(row => row?.batteryCharge)
+        const rows = body?.rows?.map((row: any, idx: number) => ({
+            battery: Math.floor(row.batteryCharge ?? btData[idx]),
+            bin: 'rec_cv8jkv5qrj65rff0ivmg',
             fillcm: row.fillLevel,
             gasppm: row.gasProduction,
             humidity: row.humidity,
@@ -45,6 +46,22 @@ export async function PUT(req: Request) {
 
         const data = await xata.db.sensordata.create(rows)
 
+        return Response.json({
+            message: 'Sucess',
+            data
+        })
+
+    } catch (error) {
+        return Response.json({
+            message: 'Error',
+            error: error
+        })
+    }
+}
+
+export async function GET(req: Request) {
+    try {
+        const data = bt?.map(row => row?.batteryCharge)
         return Response.json({
             message: 'Sucess',
             data: data
