@@ -102,7 +102,7 @@ export default function Aichatmodal({ binData }: { binData: GraphEntry[] }) {
         <DialogHeader>
           <DialogTitle>AI Chat</DialogTitle>
           <DialogDescription>
-            Chat with our AI Assistant to get more insights about this bin's
+            Chat with our AI Assistant to get more insights about this bin&apos;s
             data
           </DialogDescription>
         </DialogHeader>
