@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
+import ReactMarkdown from "react-markdown";
 import { MessageSquare, Send } from "lucide-react";
 import {
   Dialog,
@@ -113,12 +114,10 @@ export default function Aichatmodal({ binData }: { binData: GraphEntry[] }) {
                       msg.role === "user"
                         ? "bg-blue-500 text-white"
                         : "bg-gray-200 text-black"
-                    } rounded-lg mb-2`}
+                    } rounded-lg mb-2 text-sm`}
                   >
                     {msg.parts.map((part, i) => (
-                      <p key={i} className="text-sm">
-                        {part.text}
-                      </p>
+                      <ReactMarkdown key={i}>{part.text}</ReactMarkdown>
                     ))}
                   </div>
                 </div>
